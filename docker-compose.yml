@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  api:
+    # Build the Docker image from the Dockerfile in the current directory (.)
+    build: .
+    # Expose and map port 8000 on the host to port 8000 in the container
+    container_name: apiteste
+    ports:
+      - "8000:8000"
+    # Mount the current directory on the host to /app in the container
+    # This allows for live-reloading of code changes without rebuilding the image.
+    # The SQLite database file (escola.db) will also be persisted on your host machine.
+    volumes:
+      - .:/app
+    # Override the Dockerfile's CMD to ensure --reload is used for development.
+    # This command starts the uvicorn server with live-reloading enabled.
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - app-network
+networks:
+  app-network:
+    # Use the host network mode for direct access to the host's network stack.
+    # This is useful for development but should be used with caution in production.
+    driver: bridge
